@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 
@@ -42,19 +43,28 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var t []byte
-		res.Body.Read(t)
-		
-		fmt.Println(res.StatusCode,string(t))
+
+		defer res.Body.Close()
+
+		b, err := io.ReadAll(res.Body)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		fmt.Println(res.StatusCode, string(b))
 	}
 	if *act == "get" {
 		res, err := arunclient.Get(*fName, *url)
 		if err != nil {
 			log.Fatal(err)
 		}
-		var t []byte
-		res.Body.Read(t)
-		
-		fmt.Println(res.StatusCode,string(t))
+		defer res.Body.Close()
+
+		b, err := io.ReadAll(res.Body)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		fmt.Println(res.StatusCode, string(b))
 	}
 }
